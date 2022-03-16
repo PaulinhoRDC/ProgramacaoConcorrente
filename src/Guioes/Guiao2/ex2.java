@@ -49,7 +49,7 @@ class Bank {
         return accounts[id];
     }
 
-    public Bank(int n) {
+    public Bank(int n) {                                        // construtor
         accounts = new Account[n];
         for (int i = 0; i < accounts.length; i++){
             accounts[i] = new Account();
@@ -60,7 +60,7 @@ class Bank {
         // accounts[id].deposit((val));
 
         Account c = get(id);
-        /* synchronized (this) {    */         // só concorrência a nível do banco
+        // synchronized (this) {             // só concorrência a nível do banco
 
         //c.deposit(val);
         synchronized (c) {
@@ -212,22 +212,22 @@ class Main5 {
             b.deposit(i, 1000000);
         }
 
-            // for (int i=0; i<NC; i++) {b.deposit(i,1000); }           // em comentário, para começarmos com slados a 0
+        // for (int i=0; i<NC; i++) {b.deposit(i,1000); }           // em comentário, para começarmos com slados a 0
 
-            // for (int i = 0; i<N; i++){ a[i] = new Depositor(I, b); }
-            for (int i = 0; i < N; i++) {
-                a[i] = new Transferer(I, b);
-            }
-            new Observer(I,b).start();                      // sempre a observar as threads, concorrentemente
+        // for (int i = 0; i<N; i++){ a[i] = new Depositor(I, b); }
+        for (int i = 0; i < N; i++) {
+            a[i] = new Transferer(I, b);
+        }
+        new Observer(I,b).start();                      // sempre a observar as threads, concorrentemente
 
-            for (int i = 0; i < N; i++) {
-                a[i].start();
-            }
-            for (int i = 0; i < N; i++) {
-                a[i].join();
-            }
+        for (int i = 0; i < N; i++) {
+            a[i].start();
+        }
+        for (int i = 0; i < N; i++) {
+            a[i].join();
+        }
 
-            System.out.println(b.totalBalance(todasContas));                    // Para mostrar o valor final da Thread
+        System.out.println(b.totalBalance(todasContas));                    // Para mostrar o valor final da Thread
     }
 }
 

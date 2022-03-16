@@ -1,6 +1,7 @@
 package Guioes.Guiao3;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
@@ -85,7 +86,14 @@ interface Bank {
 
         HashMap<Integer, Account> accounts = new HashMap<>();
         Lock l = new ReentrantLock();
-        int lastId = 0;
+
+        /*
+        ReentrantReadWriteLock l = new ReentrantReadWriteLock();
+        Lock rl = l.readLock();
+        Lock wl = l.writeLock();
+         */
+
+        int lastId = 0;                                 // índice da última conta colocada
 
             /*
         private Account get(int id) throws InvalidAccount {
@@ -123,7 +131,7 @@ interface Bank {
             Account c = new Account();   // FAZER SEM LOCKS ADQUIRIDOS É MELHOR !
             c.deposit(balance);          // FAZER SEM LOCKS ADQUIRIDOS É MELHOR !
 
-            l.lock();
+            l.lock();                    // Poderíamos por o wl.lock();  USO O WRITE LOCK; ADQUIRIDO PARA ESCRITA
 
             try {
                 lastId += 1;
@@ -134,6 +142,51 @@ interface Bank {
             }
         }
 
+
+        int closeAccount(int id) throws InvalidAccount {
+            Account c;
+            l.lock();                               // lock do banco
+                                                    // Poderíamos por o wl.lock();  USO O WRITE LOCK; ADQUIRIDO PARA ESCRITA
+
+            try {
+                c = accounts.get(id);
+                if (c == null) throw new InvalidAccount();
+
+                c.l.lock();                         // lock da conta
+                accounts.remove(id);
+
+            } finally {
+                l.unlock();                         // libertar o lock do banco
+            }
+            try{
+                return c.balance();
+            } finally {
+                c.l.unlock();
+            }
+
+        }
+
+
+        public void deposit(int id, int val) throws InvalidAccount, NotEnoughFunds {
+            Account c;
+            l.lock();                                           // rl.lock()
+
+            try{
+                c = accounts.get(id);
+                if(c==null) throw new InvalidAccount();
+                c.l.lock();
+            } finally {
+                l.unlock();
+            }
+
+            try {
+                c.deposit(val);
+            } finally {
+                c.l.unlock();
+            }
+        }
+
+        /*
 
         public void deposit(int id, int val) throws InvalidAccount {
 
@@ -148,14 +201,15 @@ interface Bank {
             }
         }
 
-        public void withdraw(int id, int val) throws InvalidAccount, NotEnoughFunds {
+        // HIPOTESE ERRADA EM BAIXO
+
+        public void deposit(int id, int val) throws InvalidAccount, NotEnoughFunds {
             Account c;
             l.lock();
 
             try{
                 c = accounts.get(id);
                 if(c==null) throw new InvalidAccount();
-                c.withdraw(val);
             } finally {
                 l.unlock();
             }
@@ -166,30 +220,68 @@ interface Bank {
             } finally {
                 c.l.unlock();
             }
+        }
 
+        */
+
+        public void withdraw(int id, int val) throws InvalidAccount, NotEnoughFunds {
+            Account c;
+            l.lock();                                               // rl.lock()
+
+            try{
+                c = accounts.get(id);
+                if(c==null) throw new InvalidAccount();
+                c.l.lock();
+            } finally {
+                l.unlock();
+            }
+            try{
+                c.withdraw(val);
+            } finally {
+                c.l.unlock();
+            }
         }
 
 
-            //final da aula AQUIIIIIIII
-
-        public int totalBalance(int[] accounts) throws InvalidAccount {
+        public int totalBalance(int[] acs) throws InvalidAccount {
             int total = 0;
-            for (int id : accounts) {
-                total += get(id).balance();
+
+            acs = acs.clone();
+            Arrays.sort(acs);
+            Account[] a = new Account[acs.length];          // array de contas, para guardar
+
+            l.lock();                                       // rl.lock()
+
+            try{
+                for(int i=0; i<acs.length; ++i){
+                    Account c = accounts.get(acs[i]);
+                    if(c==null) throw new InvalidAccount();
+                    a[i] = c;                               // para consultarmos mais tarde
+                }
+                for(Account c : a){                         // se chegamos aqui, estámos livres de exceções !!
+                    c.l.lock();                             // lock da conta
+                }
+            } finally {
+                l.unlock();
             }
+
+            for(Account c : a){
+                total += c.balance();
+                c.l.unlock();                               // unlock da conta
+            }
+
             return total;
         }
 
-        //EXERCÍCIO 3//
 
-        public /* synchronized */ void transfer(int from, int to, int val) throws Guioes.Guiao2.InvalidAccount, Guioes.Guiao2.NotEnoughFunds {
+        public void transfer(int from, int to, int val) throws InvalidAccount, NotEnoughFunds {
 
             if (from == to) return;                      // Mesmas contas
 
-            Guioes.Guiao2.Bank.Account cfrom = get(from);
-            Guioes.Guiao2.Bank.Account cto = get(to);
+            Account cfrom = accounts.get(from);
+            Account cto = accounts.get(to);
 
-            Guioes.Guiao2.Bank.Account o1, o2;
+            Account o1, o2;
             if (from < to) {
                 o1 = cfrom;
                 o2 = cto;
@@ -202,7 +294,7 @@ interface Bank {
                 synchronized (o2) {
                     cfrom.withdraw(val);
                     cto.deposit(val);           // call dos métodos sobre os objetos !!!
-                    // pois, já os obtemos.
+                                                // pois, já os obtemos.
                 }
             }
         /*
@@ -219,9 +311,9 @@ interface Bank {
 
     class Transferer extends Thread {
         final int iterations;
-        final Guioes.Guiao2.Bank b;
+        final Bank b;
 
-        Transferer(int iterations, Guioes.Guiao2.Bank b) {
+        Transferer(int iterations, Bank b) {
             this.iterations = iterations;
             this.b = b;
         }
@@ -230,10 +322,10 @@ interface Bank {
             Random r = new Random();
             for (int i = 0; i < iterations; i++) {
                 try {
-                    int from = r.nextInt(b.accounts.length);
-                    int to = r.nextInt(b.accounts.length);
+                    int from = r.nextInt(b.accounts.size());   // no hashMap é size; (e não length)
+                    int to = r.nextInt(b.accounts.size());
                     b.transfer(from, to, 1);
-                } catch (Guioes.Guiao2.InvalidAccount | Guioes.Guiao2.NotEnoughFunds e) {
+                } catch (InvalidAccount | NotEnoughFunds e) {
                     e.printStackTrace();
                 }
             }
@@ -243,9 +335,9 @@ interface Bank {
 
     class Depositor extends Thread {
         final int iterations;
-        final Guioes.Guiao2.Bank b;
+        final Bank b;
 
-        Depositor(int iterations, Guioes.Guiao2.Bank b) {
+        Depositor(int iterations, Bank b) {
             this.iterations = iterations;
             this.b = b;
         }
@@ -253,8 +345,8 @@ interface Bank {
         public void run() {
             for (int i = 0; i < iterations; i++) {
                 try {
-                    b.deposit(i % b.accounts.length, 1);
-                } catch (Guioes.Guiao2.InvalidAccount e) {
+                    b.deposit(i % b.accounts.size(), 1);       // no hashMap é size; (e não length)
+                } catch (InvalidAccount e) {
                     e.printStackTrace();
                 }
             }
@@ -263,9 +355,9 @@ interface Bank {
 
     class Observer extends Thread {
         final int iterations;
-        final Guioes.Guiao2.Bank b;
+        final Bank b;
 
-        Observer(int iterations, Guioes.Guiao2.Bank b) {
+        Observer(int iterations, Bank b) {
             this.iterations = iterations;
             this.b = b;
         }
@@ -280,20 +372,20 @@ interface Bank {
                         System.out.println("Saldo errado: " + balance);
                     }
                 }
-            } catch (Guioes.Guiao2.InvalidAccount e) {
+            } catch (InvalidAccount e) {
                 e.printStackTrace();
             }
         }
     }
 
 
-    class Main5 {
-        public static void main(String[] args) throws InterruptedException, Guioes.Guiao2.InvalidAccount {
+    class Main6 {
+        public /* static */ void main(String[] args) throws InterruptedException, InvalidAccount {
             final int N = Integer.parseInt(args[0]);
             final int NC = Integer.parseInt(args[1]);
             final int I = Integer.parseInt(args[2]);
 
-            Guioes.Guiao2.Bank b = new Guioes.Guiao2.Bank(NC);
+            Bank b = new Bank(NC);
             Thread[] a = new Thread[N];                       // para guardar as diferentes Threads
 
             int[] todasContas = new int[NC];
@@ -309,9 +401,9 @@ interface Bank {
 
             // for (int i = 0; i<N; i++){ a[i] = new Depositor(I, b); }
             for (int i = 0; i < N; i++) {
-                a[i] = new Guioes.Guiao2.Transferer(I, b);
+                a[i] = new Transferer(I, b);
             }
-            new Guioes.Guiao2.Observer(I, b).start();                      // sempre a observar as threads, concorrentemente
+            new Observer(I, b).start();                      // sempre a observar as threads, concorrentemente
 
             for (int i = 0; i < N; i++) {
                 a[i].start();
