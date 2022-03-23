@@ -63,6 +63,9 @@ interface Bank {
 
     class Bank {
 
+        public Bank(int nc) {
+        }
+
         public static class Account {
             int balance;
 
@@ -346,7 +349,7 @@ interface Bank {
             for (int i = 0; i < iterations; i++) {
                 try {
                     b.deposit(i % b.accounts.size(), 1);       // no hashMap é size; (e não length)
-                } catch (InvalidAccount e) {
+                } catch (InvalidAccount | NotEnoughFunds e) {
                     e.printStackTrace();
                 }
             }
@@ -380,7 +383,7 @@ interface Bank {
 
 
     class Main6 {
-        public /* static */ void main(String[] args) throws InterruptedException, InvalidAccount {
+        public /* static */ void main(String[] args) throws InterruptedException, InvalidAccount, NotEnoughFunds {
             final int N = Integer.parseInt(args[0]);
             final int NC = Integer.parseInt(args[1]);
             final int I = Integer.parseInt(args[2]);
