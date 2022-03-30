@@ -46,7 +46,7 @@ public class BoundedBuffer<T> {                       // depois, pensar que o In
 
         //if (len == buf.length) throw ...                          PARA IMPLEMENTAÇÃO SEQUENCIAL
         buf[iput] = v;
-        iput += (iput + 1) % buf.length;
+        iput = (iput + 1) % buf.length;
         //len += 1;
 
         mutput.release();
@@ -68,7 +68,7 @@ class Main7 {
 
         new Thread(() -> {
             try {
-                for (int i=0;; i++) {
+                for (int i=1;; i++) {
                     System.out.println("Put de " + i);
                     b.put(i);
                     System.out.println("Put done \n");
@@ -81,7 +81,7 @@ class Main7 {
 
         new Thread(() -> {
             try {
-                for (int i=0;; i++) {
+                for (int i=1;; i++) {
                     System.out.println("Get de: " + i);
                     int c = b.get();
                     System.out.println("get retornou " + c);
