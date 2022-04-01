@@ -21,6 +21,7 @@ public class Barreira {
     private int c = 0;
 
     private boolean w = false;
+    private boolean awaking = false;
 
     public Barreira(int N) { this.N = N; }
 
@@ -32,12 +33,48 @@ public class Barreira {
         }
         if (c == N) {
             notifyAll();
-            c = 0;                                      // reset ao contador
+            awaking = true;
+            //c = 0;                                      // reset ao contador
             w = false;                                  // já não é preciso esperar
         }
         while (w){
             wait();
         }
 
+        c-=1;
+        if(c == 0){
+            awaking = false;
+        }
+
     }
 }
+
+
+
+/*
+
+public class Barreira {
+
+
+    private final int N;
+    private int c = 0;
+    private int e = 0;
+
+    public Barreira(int N) { this.N = N; }
+
+    public synchronized void await() throws InterruptedException {
+        int e_snapshot = e;
+        c += 1;
+
+        if (c == N) {
+            notifyAll();
+            c = 0;                                      // reset ao contador
+            e += 1;
+        }
+        else while(e == e_snapshot){
+        wait();
+        }
+    }
+}
+
+ */
