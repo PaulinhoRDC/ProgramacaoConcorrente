@@ -78,3 +78,32 @@ public class Barreira {
 }
 
  */
+
+/*
+
+public class Barreira {
+
+    class Instance { int c = 0; }
+
+    private final int N;
+    private Instance e = new Instance();
+
+    public Barreira(int N) { this.N = N; }
+
+    public synchronized Instance await() throws InterruptedException {
+        Instance e_snapshot = e;
+        e.c += 1;
+
+        if (e.c == N) {
+            notifyAll();
+            e.c = 0;                                      // reset ao contador
+            e = new Instance();
+        }
+        else while(e == e_snapshot){
+        wait();
+        }
+        return e_snapshot;
+    }
+}
+
+ */
