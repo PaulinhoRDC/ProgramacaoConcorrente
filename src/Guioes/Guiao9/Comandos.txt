@@ -1,0 +1,18 @@
+/*
+
+paulinhordc@MacBook-Pro-de-Paulo ProgramacaoConcorrente-1 % netstat -p tcp                 
+Active Internet connections
+Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)    
+tcp4       0      0  172.26.4.155.50277     51.105.71.136.https    ESTABLISHED
+tcp4       0      0  172.26.4.155.50090     162.159.135.234.https  ESTABLISHED
+tcp6       0      0  macbook-pro-de-p.black fe80::9dca:e88b:.1027  ESTABLISHED
+tcp6       0      0  macbook-pro-de-p.1024  fe80::9dca:e88b:.1024  ESTABLISHED
+tcp4       0      0  172.26.4.155.51143     17.250.80.102.443      ESTABLISHED
+tcp4       0      0  172.26.4.155.51142     17.248.180.228.443     TIME_WAIT  
+tcp4       0      0  172.26.4.155.51141     17.248.180.228.443     TIME_WAIT  
+tcp4       0      0  172.26.4.155.51013     17.57.146.38.5223      ESTABLISHED
+
+
+------------------------
+
+*/
