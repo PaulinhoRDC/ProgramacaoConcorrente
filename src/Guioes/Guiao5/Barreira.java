@@ -1,8 +1,4 @@
-package Guioes.Guiao5;
-
-public class Barreira {
-
-    /*
+/*
 
     3. Escreva uma abstracção para permitir que N threads se sincronizem:
                     class Barreira {
@@ -16,6 +12,41 @@ public class Barreira {
            (barreira reutilizável), de modo a suportar a sincronização no fim de cada uma de várias fases de computação.
 
      */
+
+    class Main {
+        public static void main(String[] args) {
+            Barreira b= new Barreira(3);
+            new Thread(()->{
+                try{
+                    Thread.sleep(100);
+                    System.out.println("vou fazer await - 1");
+                    b.await();
+                    System.out.println("await returnou - 1");
+                }catch(Exception e){}
+            }).start();
+    
+            new Thread(()->{
+                try{
+                    Thread.sleep(1000);
+                    System.out.println("vou fazer await - 2");
+                    b.await();
+                    System.out.println("await returnou - 2");
+                }catch(Exception e){}
+            }).start();
+    
+            new Thread(()->{
+                try{
+                    Thread.sleep(2500);
+                    System.out.println("vou fazer await - 3");
+                    b.await();
+                    //Thread.sleep(2500);
+                    System.out.println("await returnou - 3");
+                }catch(Exception e){}
+            }).start();
+        }     
+    }
+
+public class Barreira {
 
     private final int N;
     private int c = 0;
