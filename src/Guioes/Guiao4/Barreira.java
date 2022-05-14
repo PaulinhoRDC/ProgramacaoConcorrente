@@ -1,6 +1,40 @@
-package Guioes.Guiao4;
-
 import java.util.concurrent.Semaphore;
+
+class Main {
+    public static void main(String[] args){
+        Barreira b = new Barreira(3);
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                System.out.println("Vou fazer await - 1");
+                b.await();
+                System.out.println("wait retornou - 1");
+            }
+            catch(Exception e ){}
+        }).start();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(10000);
+                System.out.println("Vou fazer await - 2");
+                b.await();
+                System.out.println("wait retornou - 2");
+            }
+            catch(Exception e ){}
+        }).start();
+
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+                System.out.println("Vou fazer await - 3");
+                b.await();
+                System.out.println("wait retornou - 3");
+            }
+            catch(Exception e ){}
+        }).start();
+    }
+}
 
 public class Barreira {
 
@@ -39,3 +73,4 @@ public class Barreira {
          */
     }
 }
+

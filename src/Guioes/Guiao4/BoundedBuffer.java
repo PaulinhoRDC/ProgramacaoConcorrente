@@ -1,6 +1,38 @@
-package Guioes.Guiao4;
-
 import java.util.concurrent.Semaphore;
+
+class Main {
+    public static void main(String[] args) throws InterruptedException {
+        BoundedBuffer b = new BoundedBuffer(20);
+
+        new Thread(() -> {
+            try {
+                for (int i=1;; i++) {
+                    System.out.println("Put de " + i);
+                    b.put(i);
+                    System.out.println("Put done \n");
+                    Thread.sleep(2000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        new Thread(() -> {
+            try {
+                for (int i=1;; i++) {
+                    System.out.println("Get de: " + i);
+                    int c = b.get();
+                    System.out.println("get retornou " + c);
+                    Thread.sleep(300);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+    }
+}
+
 
 public class BoundedBuffer<T> {                       // depois, pensar que o Int, poderia ser um T (tipo genérico)
 
@@ -62,36 +94,4 @@ class Producer extends Thread{
 */
 
 
-class Main7 {
-    public static void main(String[] args) throws InterruptedException {
-        BoundedBuffer b = new BoundedBuffer(20);
-
-        new Thread(() -> {
-            try {
-                for (int i=1;; i++) {
-                    System.out.println("Put de " + i);
-                    b.put(i);
-                    System.out.println("Put done \n");
-                    Thread.sleep(200);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-        new Thread(() -> {
-            try {
-                for (int i=1;; i++) {
-                    System.out.println("Get de: " + i);
-                    int c = b.get();
-                    System.out.println("get retornou " + c);
-                    Thread.sleep(2000);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-    }
-}
 
