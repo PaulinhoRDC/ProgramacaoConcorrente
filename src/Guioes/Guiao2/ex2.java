@@ -1,13 +1,9 @@
-package Guioes.Guiao2;
-
 import java.util.Random;
 
 class NotEnoughFunds extends  Exception{}
 class InvalidAccount extends  Exception{}
 
-
 /*
-
 2. Implemente uma classe Banco que ofereça os métodos da interface abaixo, para crédito, débito e consulta
 do saldo total de um conjunto de contas.
 Considere um número fixo de contas, definido no construtor do Banco, com saldo inicial nulo.
@@ -18,7 +14,6 @@ interface Bank {
     void withdraw(int id, int val) throws InvalidAccount, NotEnoughFunds;
     int totalBalance(int accounts[]) throws InvalidAccount;
 }
-
  */
 
 class Bank {

@@ -1,6 +1,4 @@
-package Guioes.Guiao2;
 /*
-
 Devemos fazer:               l.lock()                 l.lock()
                                  -                       -
                                  -                       -
