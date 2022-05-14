@@ -1,9 +1,38 @@
-package Guioes.Guiao6;
-
-
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+class Main {
+    public static void main(String[] args) throws InterruptedException {
+        BoundedBufferCondition b = new BoundedBufferCondition(20);
+            new Thread(() -> {
+                try {
+                    for (int i=0;; i++) {
+                        System.out.println("Put de " + i);
+                        b.put(i);
+                        System.out.println("Put done \n");
+                        Thread.sleep(2900);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            new Thread(() -> {
+                try {
+                    for (int i=0;; i++) {
+                        System.out.println("Get de: " + i);
+                        int c = b.get();
+                        System.out.println("get retornou " + c);
+                        Thread.sleep(2000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+    }
+}
 
 public class BoundedBufferCondition {
 
@@ -35,11 +64,8 @@ public class BoundedBufferCondition {
                 res = buf[iget];
                 iget = (iget + 1) % buf.length;
 
-                notFull.signal();
-                //if (nelems == buf.length){            <- errado
-                //    notFull.signal();
-                //}
                 nelems -= 1;
+                notFull.signal();
 
                 return res;
             } finally {
@@ -59,49 +85,15 @@ public class BoundedBufferCondition {
                 iput = (iput + 1) % buf.length;
 
                 nelems += 1;
-                //notifyAll();
-                notEmpty.signal();
+                notEmpty.signal();                 //notifyAll() das que estão em espera por o buffer estar vazio
+
             } finally {
                 l.unlock();
             }
 
 
         }
-    }
-
-
-    class Main9 {
-        public static void main(String[] args) throws InterruptedException {
-            BoundedBufferCondition b = new BoundedBufferCondition(20);
-
-            new Thread(() -> {
-                try {
-                    for (int i=0;; i++) {
-                        System.out.println("Put de " + i);
-                        b.put(i);
-                        System.out.println("Put done \n");
-                        Thread.sleep(200);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-            new Thread(() -> {
-                try {
-                    for (int i=0;; i++) {
-                        System.out.println("Get de: " + i);
-                        int c = b.get();
-                        System.out.println("get retornou " + c);
-                        Thread.sleep(2000);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-        }
-    }
+}
 
 
 
