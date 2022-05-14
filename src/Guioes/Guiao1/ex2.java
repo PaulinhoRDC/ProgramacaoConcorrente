@@ -1,35 +1,13 @@
-package Guioes.Guiao1;
-
-class Counter2 {
-    int value=0;
-}
-
-class Printer2 extends Thread {
-    final int iterations;
-    final Counter2 c;
-
-    Printer2(int iterations, Counter2 c) {
-        this.iterations = iterations;
-        this.c = c;
-    }
-
-    public void run(){
-        for (int i=0; i< iterations; i++){
-            c.value +=1 ;                           //Para incrementar o contador
-        }
-    }
-}
-
-class Main2 {
+class Main {
     public static void main (String[] args) throws InterruptedException {
         final int N = Integer.parseInt(args[0]);
         final int I = Integer.parseInt(args[1]);
 
-        Counter2 c = new Counter2();                      // criação do objeto contador, para pudermos passar como argumento no printer, para cada Thread ter o seu próprio contador
+        Counter c = new Counter();                      // criação do objeto contador, para pudermos passar como argumento no printer, para cada Thread ter o seu próprio contador
 
         Thread[] a = new Thread[N];                     // para guardar as diferentes Threads
 
-        for (int i = 0; i<N; i++){ a[i] = new Printer2(I, c); }
+        for (int i = 0; i<N; i++){ a[i] = new Printer(I, c); }
         for (int i = 0; i<N; i++){ a[i].start(); }
         for (int i = 0; i<N; i++){ a[i].join();  }
 
@@ -46,3 +24,28 @@ class Main2 {
     }
 }
 
+class Counter {
+    int value=0;
+}
+
+class Printer extends Thread {
+    final int iterations;
+    final Counter c;
+
+    Printer(int iterations, Counter c) {
+        this.iterations = iterations;
+        this.c = c;
+    }
+
+    public void run(){
+        for (int i=0; i< iterations; i++){
+            c.value +=1 ;                           //Para incrementar o contador
+        }
+    }
+}
+
+/*
+paulinhordc@MBP-de-Paulo Guiao1 % javac ex2.java   
+paulinhordc@MBP-de-Paulo Guiao1 % java ex2.java 2 2
+4
+*/

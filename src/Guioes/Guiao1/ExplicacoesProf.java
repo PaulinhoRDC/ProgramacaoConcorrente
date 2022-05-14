@@ -1,4 +1,21 @@
-package Guioes.Guiao1;
+class Main {
+    public static void main (String[] args) throws InterruptedException {
+
+
+        Thread t1 = new MyThread();
+        Thread t2 = new MyThread();
+        t1.start();                 // intuito de dar start na Thread
+        t2.start();
+        t1.join();                  // intuito de esperar que a Thread termine
+        t2.join();
+
+        System.out.println("Main");
+
+        Thread t = new Thread(new MyRunnable());                // OUTRA ESTRATÉGIA
+        t.start();
+
+    }
+}
 
 class MyThread extends Thread {
     public void run() {                            // TOPO DA MAIN
@@ -18,23 +35,13 @@ class MyRunnable implements Runnable {
     }
 }
 
-
-
-class Main4 {
-    public static void main (String [] args) throws InterruptedException {
-
-
-        Thread t1 = new MyThread();
-        Thread t2 = new MyThread();
-        t1.start();                 // intuito de dar start na Thread
-        t2.start();
-        t1.join();                  // intuito de esperar que a Thread termine
-        t2.join();
-
-        System.out.println("Main");
-
-        Thread t = new Thread(new MyRunnable());                // OUTRA ESTRATÉGIA
-        t.start();
-
-    }
-}
+/*
+paulinhordc@MBP-de-Paulo Guiao1 % javac ExplicacoesProf.java
+paulinhordc@MBP-de-Paulo Guiao1 % java ExplicacoesProf.java 
+Hello World
+Hello World
+Hello World
+Hello World
+Main
+Runnable
+*/
