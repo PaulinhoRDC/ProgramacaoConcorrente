@@ -1,6 +1,3 @@
-package Guioes.Guiao3;
-
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
@@ -9,9 +6,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class NotEnoughFunds extends  Exception{}
 class InvalidAccount extends  Exception{}
-
-
-
 
 /*
 
@@ -382,7 +376,7 @@ interface Bank {
     }
 
 
-    class Main6 {
+    class Main {
         public /* static */ void main(String[] args) throws InterruptedException, InvalidAccount, NotEnoughFunds {
             final int N = Integer.parseInt(args[0]);
             final int NC = Integer.parseInt(args[1]);
