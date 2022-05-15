@@ -8,10 +8,10 @@ class Main {
             new Thread(() -> {
                 try {
                     for (int i=0;; i++) {
-                        System.out.println("Put de " + i);
+                        System.out.println("Put de " + i + "\n");
                         b.put(i);
                         System.out.println("Put done \n");
-                        Thread.sleep(2900);
+                        Thread.sleep(4000);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -21,10 +21,10 @@ class Main {
             new Thread(() -> {
                 try {
                     for (int i=0;; i++) {
-                        System.out.println("Get de: " + i);
+                        System.out.println("Get de: " + i + "\n");
                         int c = b.get();
-                        System.out.println("get retornou " + c);
-                        Thread.sleep(2000);
+                        System.out.println("get retornou " + c + "\n");
+                        Thread.sleep(1000);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -57,7 +57,7 @@ public class BoundedBufferCondition {
             l.lock();
             try{
                 while(nelems == 0){
-                    notEmpty.wait();
+                    notEmpty.await();
                 }
 
                 int res;
@@ -78,7 +78,7 @@ public class BoundedBufferCondition {
             l.lock();
             try{
                 while(nelems == buf.length){
-                    notFull.wait();
+                    notFull.await();
                 }
 
                 buf[iput] = v;
