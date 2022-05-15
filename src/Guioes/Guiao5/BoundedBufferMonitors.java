@@ -59,8 +59,8 @@ public class BoundedBufferMonitors<T> {   // depois, pensar que o Int, poderia s
         iget = (iget + 1) % buf.length;
 
         // notify();            ia correr mal!!!
-        notifyAll();
         nelems -= 1;
+        notifyAll();
         //if (nelems == buf.length - 1) {             // ???
         //    notifyAll();
         //}
