@@ -23,7 +23,7 @@ Não temos de ter threads bloqueadas, à espera de resposta de outras.
 
 */
 
-class JogoImpl implements Jogo {                // ESPÉCIE DE BARREIRA
+class JogoImpl implements Jogo {                        // ESPÉCIE DE BARREIRA
     PartidaImpl p = new PartidaImpl();
     int jogadores = 0;
 
