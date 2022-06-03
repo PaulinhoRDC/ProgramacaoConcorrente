@@ -4,37 +4,49 @@
 start() -> register(?MODULE,spawn(fun() -> loop(dict:new()) end)).   %inicar o modulo com nome MODULE e um loop 
 
 
+%create_account(Username, Passwd) -> call({create_account,Username,Passwd}).
+create_account(User,Pass) -> 
+    login_manager ! {{create_account, User, Pass}, self()},   %mandar mensagem ao module com a funcao que quero e o meu pid
+    receive
+        {Res, login_manager} -> Res end.
+
 % Para abstrair o padrão comum das create e close account
 call(Request) ->
-    ?MODULE ! {Request,self()},          %mandar request ao module com o meu pid
-    receive {Res, ?MODULE} -> Res end.   % esperar receber resposta
+    login_manager ! {Request,self()},          %mandar request ao module com o meu pid
+    receive {Res, login_manager} -> Res end.   % esperar receber resposta
 
 
 stop() -> call(stop).
+%
 
-create_account(Username, Passwd) -> call({create_account,Username,Passwd}).
-%create_account(User,Pass) -> 
-%    ?MODULE ! {create_account, User, Pass, self()}   %mandar mensagem ao module com a funcao que quero e o meu pid
-%    receive {Res, ?MODULE} -> Res end.
+%close_account(Username, Passwd) -> call({close_account,Username,Passwd}).
+close_account(User, Pass) ->
+    login_manager ! {{close_account, User, Pass}, self()},   %mandar mensagem ao module com a funcao que quero e o meu pid
+    receive 
+        {Res, login_manager} -> Res end.
 
-close_account(Username, Passwd) -> call({close_account,Username,Passwd}).
-%close_account(Username, Passwd) ->
-%    ?MODULE ! {close_account, User, Pass, self()}   %mandar mensagem ao module com a funcao que quero e o meu pid
-%    receive {Res, ?MODULE} -> Res end.
+%login(Username, Passwd) -> call({login,Username,Passwd}).
+login(User,Pass) ->
+    login_manager ! {{login, User, Pass}, self()},   %mandar mensagem ao module com a funcao que quero e o meu pid
+    receive
+        {Res, login_manager} -> Res end.
 
-login(Username, Passwd) -> call({login,Username,Passwd}).
-%login(User,Pass) ->
-%    ?MODULE ! {login, User, Pass, self()}   %mandar mensagem ao module com a funcao que quero e o meu pid
-%    receive {Res, ?MODULE} -> Res end.
+%logout(Username) -> call({logout,Username}).
+logout(User) ->
+    login_manager ! {{logout, User}, self()},
+    receive 
+        {Res, login_manager} -> Res end.
 
-logout(Username) -> call({logout,Username}).
-
-online() -> call(online).
+%online() -> call(online).
+online() ->
+    login_manager ! {online, self()},
+    receive
+        {Res, login_manager} -> Res end.
 
 
 loop (Map) ->
     receive
-        {create_account, User, Pass, From}->                    %from é o pid de quem mandou o pedido
+        {{create_account, User, Pass}, From}->                    %from é o pid de quem mandou o pedido
             case dict:find(User,Map) of
                 error ->
                     From ! {ok, ?MODULE},                       % mandar mensagem ao from a dizer ok
@@ -45,7 +57,7 @@ loop (Map) ->
                     loop(Map)                                   %chama esta funcao (continua a fazer o que estava
             end;
 
-        {close_account, User, Pass, From}->
+        {{close_account, User, Pass}, From}->
             case dict:find(User,Map) of
                 {ok, {Pass, _}} ->                        % _ -> uma coisa qualquer é onde diz se esta online (T/F)
                     From ! {ok, ?MODULE},
