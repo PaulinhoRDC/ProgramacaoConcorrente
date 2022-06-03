@@ -1,4 +1,3 @@
-
 class Main {
     public static void main (String[] args) throws InterruptedException {
         final int N = Integer.parseInt(args[0]);
